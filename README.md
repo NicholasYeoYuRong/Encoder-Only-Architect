@@ -10,7 +10,7 @@ Intent: alarm_set
 Slots:  time = "five am", date = "this week"
 ```
 
-The project includes data preparation, GloVe embedding initialization, model training, validation-based checkpoint selection, evaluation, and sample predictions in a Jupyter notebook.
+The project uses pretrained **GloVe (Global Vectors for Word Representation)** word embeddings with **100 dimensions per word**, loaded from `glove.6B.100d.txt`. These vectors initialize the model's word embeddings and are fine-tuned during training. The project includes data preparation, embedding initialization, model training, validation-based checkpoint selection, evaluation, and sample predictions in a Jupyter notebook.
 
 ## Features
 
@@ -27,13 +27,11 @@ The project includes data preparation, GloVe embedding initialization, model tra
 ```text
 .
 |-- main.ipynb                    # Preprocessing, model, training, and evaluation
-|-- build_embeddings.py           # Standalone GloVe matrix builder
 |-- requirements.txt              # Pinned Python dependencies
 |-- vocab.json                    # Token-to-ID vocabulary
 |-- model_checkpoint.pt           # Saved model weights and label mappings
 |-- embeddings/
 |   |-- glove.6B.100d.txt          # Source GloVe word vectors
-|   |-- glove.6B.zip              # GloVe archive
 |   `-- glove_matrix.npy          # Vocabulary-aligned embedding matrix
 `-- 1.0/
     |-- data/                     # MASSIVE multilingual JSONL files
@@ -100,16 +98,28 @@ Open `main.ipynb` in a notebook editor such as VS Code and select the `.venv` Py
 
 Keep the working directory at the project root because all data and artifact paths are relative.
 
+### Download the pretrained GloVe embeddings
+
+Download the [GloVe 6B archive (`glove.6B.zip`)](https://huggingface.co/stanfordnlp/glove/resolve/main/glove.6B.zip?download=true) from the [Stanford NLP GloVe repository on Hugging Face](https://huggingface.co/stanfordnlp/glove). The archive is approximately 862 MB and includes the **100-dimensional** vectors used by this project, alongside other embedding dimensions.
+
+Extract `glove.6B.100d.txt` from the archive and place it at:
+
+```text
+embeddings/glove.6B.100d.txt
+```
+
+The download link provides the ZIP archive; `glove.6B.100d.txt` is the file to select after extraction. If that file is already present at the path above, it is ready to use.
+
 ## Run training and evaluation
 
 1. Open `main.ipynb` and run the preprocessing cells in order.
-2. After the sequence-length verification cell and before the `MassiveDataset` definition, insert and run this cell:
+2. Run the dataset definition cell, which sets the maximum token length before defining `MassiveDataset`:
 
    ```python
    max_length = 64
    ```
 
-   The notebook references this variable without defining it. A value of 64 accommodates the dataset and matches the included checkpoint's positional embedding shape.
+   A value of 64 accommodates the dataset and matches the included checkpoint's positional embedding shape.
 
 3. Continue through the dataset, model, and training setup cells.
 4. Run the training loop, learning-curve plots, checkpoint reload, evaluation, and prediction cells.
