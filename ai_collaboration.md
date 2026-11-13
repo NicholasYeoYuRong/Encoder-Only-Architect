@@ -1528,3 +1528,26 @@ df7a-3873-4216-b8d9-4fa03e5d1030\scratchpad\main.ipynb.bak.
 ✻ Cogitated for 2m 29s · done 10:19 PM
 
 ※ recap: You're improving the model's intent accuracy and slot F1 without touching the baseline, and Part D is back to trainable GloVe with the frozen-GloVe attempt recorded in D7. Next, re-run Part D to get the unfrozen results.
+
+---
+
+## 12 November 2026 — evaluation and reproducibility follow-up
+
+**Tool:** OpenAI Codex. The exact model identifier was not recorded in this entry.
+
+**User requests:**
+
+> In the SC4002-1 folder main.ipynb, help to update validation scores to ensure everything is up to date. Run it through from start to end, and remove any manually entered score fallbacks. Report the final findings in summary
+
+> Can you resolve the multiset slot scorer and update the notebook then?
+
+**Work and reasoning:** The notebook's comparison cell had a manually entered baseline-score fallback, and saved outputs from different runs disagreed. Codex removed the fallback and reran both stages. It then pointed out that the shared slot evaluator counted duplicate type-and-span pairs as a multiset, whereas the assignment specifies a set of pairs for each utterance. Following the user's request, Codex changed the shared evaluator to deduplicate exact pairs within each utterance and pool true positives, false positives and false negatives across utterances. Checks for duplicate gold pairs, duplicate predictions, mismatched types and spans, and empty sets passed.
+
+Codex reran the full notebook with the corrected scorer, selecting both checkpoints using the average of validation intent accuracy and slot micro-F1. Both checkpoint reload checks passed; the notebook contains the actual training logs and outputs. The corrected scoring changed the baseline's selected checkpoint from epoch 12 in the immediately preceding multiset-scored run to epoch 17. The improved system selected epoch 23.
+
+| Model | Best epoch | Validation intent accuracy | Validation slot micro-F1 | Test intent accuracy | Test slot micro-F1 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Baseline | 17 | 83.42% | 63.80% | 82.48% | 58.95% |
+| Improved | 23 | 86.82% | 66.83% | 85.74% | 64.32% |
+
+The historical frozen-GloVe experiment in notebook section D7 used the earlier multiset scorer; its recorded figures are not directly comparable with the corrected results. The test split had already been inspected in earlier experiments, so it should not be described as previously untouched. This entry is a summary of the collaboration, not a complete verbatim chat export.
